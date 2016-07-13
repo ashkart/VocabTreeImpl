@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="97">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <logicalFolder name="SourceFiles"
+                   displayName="Исходные файлы"
+                   projectFiles="true">
+      <itemPath>src/BowVector.cpp</itemPath>
+      <itemPath>src/DBoW2.cmake.in</itemPath>
+      <itemPath>src/FBrief.cpp</itemPath>
+      <itemPath>src/FORB.cpp</itemPath>
+      <itemPath>src/FSurf64.cpp</itemPath>
+      <itemPath>src/FeatureVector.cpp</itemPath>
+      <itemPath>src/QueryResults.cpp</itemPath>
+      <itemPath>src/ScoringObject.cpp</itemPath>
+      <itemPath>main.cpp</itemPath>
+    </logicalFolder>
+    <logicalFolder name="HeaderFiles"
+                   displayName="Файлы заголовков"
+                   projectFiles="true">
+      <itemPath>include/DBoW2/BowVector.h</itemPath>
+      <itemPath>include/DBoW2/DBoW2.h</itemPath>
+      <itemPath>include/DBoW2/FBrief.h</itemPath>
+      <itemPath>include/DBoW2/FClass.h</itemPath>
+      <itemPath>include/DBoW2/FORB.h</itemPath>
+      <itemPath>include/DBoW2/FSurf64.h</itemPath>
+      <itemPath>include/DBoW2/FeatureVector.h</itemPath>
+      <itemPath>include/HashMap.h</itemPath>
+      <itemPath>include/HashNode.h</itemPath>
+      <itemPath>include/KeyHash.h</itemPath>
+      <itemPath>include/DBoW2/QueryResults.h</itemPath>
+      <itemPath>include/DBoW2/ScoringObject.h</itemPath>
+      <itemPath>include/DBoW2/TemplatedDatabase.h</itemPath>
+      <itemPath>include/DBoW2/TemplatedVocabulary.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="ResourceFiles"
+                   displayName="Файлы ресурсов"
+                   projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Файлы тестов"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Важные файлы"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Debug" type="1">
+      <toolsSet>
+        <compilerSet>default</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <compileType>
+        <ccTool>
+          <standard>8</standard>
+          <incDir>
+            <pElem>include/DBoW2</pElem>
+            <pElem>../../SDKs/opencv-2.4.13/include/opencv2</pElem>
+            <pElem>../../SDKs/DLib-1.0/include/DUtils</pElem>
+            <pElem>../../SDKs/DLib-1.0/include/DUtilsCV</pElem>
+            <pElem>../../SDKs/DLib-1.0/include/DVision</pElem>
+            <pElem>include</pElem>
+          </incDir>
+        </ccTool>
+        <linkerTool>
+          <linkerDynSerch>
+            <pElem>include/DBoW2</pElem>
+            <pElem>../../SDKs/opencv-2.4.13/build/lib</pElem>
+            <pElem>../../SDKs/DLib-1.0/build</pElem>
+            <pElem>include</pElem>
+          </linkerDynSerch>
+          <linkerLibItems>
+            <linkerLibLibItem>opencv_calib3d</linkerLibLibItem>
+            <linkerLibLibItem>opencv_contrib</linkerLibLibItem>
+            <linkerLibLibItem>opencv_core</linkerLibLibItem>
+            <linkerLibLibItem>opencv_features2d</linkerLibLibItem>
+            <linkerLibLibItem>opencv_flann</linkerLibLibItem>
+            <linkerLibLibItem>opencv_gpu</linkerLibLibItem>
+            <linkerLibLibItem>opencv_highgui</linkerLibLibItem>
+            <linkerLibLibItem>opencv_imgproc</linkerLibLibItem>
+            <linkerLibLibItem>opencv_legacy</linkerLibLibItem>
+            <linkerLibLibItem>opencv_ml</linkerLibLibItem>
+            <linkerLibLibItem>opencv_nonfree</linkerLibLibItem>
+            <linkerLibLibItem>opencv_objdetect</linkerLibLibItem>
+            <linkerLibLibItem>opencv_ocl</linkerLibLibItem>
+            <linkerLibLibItem>opencv_photo</linkerLibLibItem>
+            <linkerLibLibItem>opencv_stitching</linkerLibLibItem>
+            <linkerLibLibItem>opencv_superres</linkerLibLibItem>
+            <linkerLibLibItem>opencv_video</linkerLibLibItem>
+            <linkerLibLibItem>opencv_videostab</linkerLibLibItem>
+            <linkerLibLibItem>DLib</linkerLibLibItem>
+          </linkerLibItems>
+          <commandLine>-lpqxx -lpq</commandLine>
+        </linkerTool>
+      </compileType>
+      <item path="include/DBoW2/BowVector.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/DBoW2/DBoW2.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/DBoW2/FBrief.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/DBoW2/FClass.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/DBoW2/FORB.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/DBoW2/FSurf64.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/DBoW2/FeatureVector.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/DBoW2/QueryResults.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/DBoW2/ScoringObject.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/DBoW2/TemplatedDatabase.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/DBoW2/TemplatedVocabulary.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/HashMap.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/HashNode.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/KeyHash.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/BowVector.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/DBoW2.cmake.in" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/FBrief.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/FORB.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/FSurf64.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/FeatureVector.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/QueryResults.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/ScoringObject.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+    </conf>
+    <conf name="Release" type="1">
+      <toolsSet>
+        <compilerSet>default</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <compileType>
+        <cTool>
+          <developmentMode>5</developmentMode>
+        </cTool>
+        <ccTool>
+          <developmentMode>5</developmentMode>
+          <standard>8</standard>
+        </ccTool>
+        <fortranCompilerTool>
+          <developmentMode>5</developmentMode>
+        </fortranCompilerTool>
+        <asmTool>
+          <developmentMode>5</developmentMode>
+        </asmTool>
+      </compileType>
+      <item path="include/DBoW2/BowVector.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/DBoW2/DBoW2.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/DBoW2/FBrief.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/DBoW2/FClass.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/DBoW2/FORB.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/DBoW2/FSurf64.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/DBoW2/FeatureVector.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/DBoW2/QueryResults.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/DBoW2/ScoringObject.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/DBoW2/TemplatedDatabase.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/DBoW2/TemplatedVocabulary.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/HashMap.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/HashNode.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/KeyHash.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/BowVector.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/DBoW2.cmake.in" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/FBrief.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/FORB.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/FSurf64.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/FeatureVector.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/QueryResults.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/ScoringObject.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+    </conf>
+  </confs>
+</configurationDescriptor>
