@@ -38,12 +38,8 @@ using namespace pqxx;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-void loadFeatures(vector<vector<vector<float> > > &features);
 void changeStructure(const vector<float> &plain, vector<vector<float> > &out,
   int L);
-void testVocCreation(const vector<vector<vector<float> > > &features);
-void testDatabase(const vector<vector<vector<float> > > &features);
-
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -130,37 +126,40 @@ void loadFeaturesToDB(vector<vector<vector<float> > > &features, string &imageDi
 int main()
 {
     vector<vector<vector<float> > > features;
-    string fileDB = "test_db.yml.gz";
-    string fileVoc = "small_voc.yml.gz";
-    string imageDir = "/home/max/NetBeansProjects/CppApplication_1/im2";
+    string imageDir = "images";
     
-  
+    
     try {
         string conn_str = "host=localhost user=admin password=ss dbname=pgTest";
         connection c(conn_str);
-        
-        
+
         //cout << "Retrieving voc_tree..." << endl;
         const int k = 8;
         const int L = 6;
         const WeightingType weight = TF_IDF;
         const ScoringType score = L1_NORM;
-        const string tname = "testTree";
+        string vocabularyName = "myVocabulary";
         
-        Surf64Vocabulary voc(c,tname);
+        Surf64Vocabulary voc(vocabularyName, k, L, weight, score);
+        getFeatures(features, imageDir);
+        voc.create(features);
+        voc.saveToPG(c);
         
         cout << "Creating database..." << endl;
-        Surf64Database db("test_db.yml.gz");
-        
+        Surf64Database db(c, vocabularyName);// можно использовать экземпляр voc,
+                                             // вызвав конструктор "полегче",
+                                             // но для демонстрации работы с СУБД 
+                                             // оставляю так
+        /*================================================================*/
         cout << "loading data into db..." << endl;
         loadFeaturesToDB(features, imageDir, db);
         
-        db.save(fileDB);
-        cout << "Job Done!" << endl; 
+        string datasetName = "myImageDataset";
+        db.save(c, );
+        cout << "DB writed!" << endl; 
         
-        //wait();
+        //теперь попробуем выполнить запрос 
         
-        /*
         cout << "Querying result..." << endl;
         QueryResults ret;
         features.clear();
@@ -168,78 +167,20 @@ int main()
         string qi = "/home/max/NetBeansProjects/CppApplication_1/im2/255-srbn.jpg";
         getFeature(features, qi);
         db.query(features[0], ret, 4);
-
+        
         cout << "the result is:\n" << ret << endl;
-        */
+        
+        /**
+         * как видно, запросы сейчас выполняются к набору данных, загруженному 
+         * в память из БД а не к самой БД.
+         * 
+         */
+        
     } catch (const pqxx::pqxx_exception &e) {
         std::cerr << "Error:\n" << e.base().what() << std::endl;
     }
-
-    
-
-
     cv::waitKey();
     return 0;
-}
-
-// ----------------------------------------------------------------------------
-
-void loadFeatures(vector<vector<vector<float> > > &features)
-{
-    bool isCanLoad = false;
-    features.clear();
-    features.reserve(NIMAGES);
-
-    cv::SURF surf(400, 4, 2, EXTENDED_SURF);
-
-    cout << "Extracting SURF features..." << endl;
-
-    DIR *dir = opendir("images");
-    if(dir)
-    {
-        struct dirent *ent;
-        while((ent = readdir(dir)) != NULL)
-        {
-            char *dname = ent->d_name;
-            if (sizeof(dname) > 2 && dname[0] != '.')
-            {
-                stringstream ss;
-                ss << "images" << "/" << dname;
-                //puts(ent->d_name); //вывод имени элемента папки *dir
-                cout << ss.str() << endl;
-                vector<cv::KeyPoint> keypoints;
-                vector<float> descriptors;
-                stringstream fld;
-                fld << "surf/" << dname << ".yml";
-                if (isCanLoad)
-                {
-                    cv::FileStorage fs(fld.str(), cv::FileStorage::READ);
-                    //cv::FileNode kptFileNode = fs["Keypoints"];
-                    //read(kptFileNode, keypoints);
-                    fs["Descriptors"] >> descriptors;
-                    //fs["Name"] >> dname;
-                    fs.release();
-                }
-                else
-                {
-                    cv::Mat image = cv::imread(ss.str(), 0);
-                    cv::Mat mask;
-                    surf(image, mask, keypoints, descriptors);
-                    cv::FileStorage fs(fld.str(), cv::FileStorage::WRITE);
-                    //cv::write(fs, "Keypoints", keypoints);
-                    cv::write(fs, "Descriptors", descriptors);
-                    cv::write(fs, "Name", dname);
-                    fs.release();
-                }
-                features.push_back(vector<vector<float> >());
-                changeStructure(descriptors, features.back(), surf.descriptorSize());
-            }
-        }
-    }
-    else
-    {
-        fprintf(stderr, "Error opening directory\n");
-    }
 }
 
 // ----------------------------------------------------------------------------
