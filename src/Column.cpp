@@ -13,21 +13,21 @@ namespace DBoW2 {
 
     Column::~Column(){}
     
-    const string Column::ID = "ID";
-    const string Column::BRANCHING = "BRANCHING";
-    const string Column::DEPTH = "DEPTH";
-    const string Column::NAME = "NAME";
-    const string Column::SCORING_TYPE = "SCORING_TYPE";
-    const string Column::WEIGHTING_TYPE = "WEIGHTING_TYPE";
-    const string Column::PARENT_ID = "PARENT_ID";
-    const string Column::WEIGHT = "WEIGHT";
-    const string Column::DESCRIPTOR = "DESCRIPTOR";
-    const string Column::VOCAB_NAME = "VOCAB_NAME";
-    const string Column::NODE_ID = "NODE_ID";
-    const string Column::ENTRIES_NUM = "ENTRIES_NUM";
-    const string Column::USING_DI = "USING_DI";
-    const string Column::DI_LEVELS = "DI_LEVELS";
-    const string Column::IMG_ID = "IMG_ID";
-    const string Column::IMG_NAME = "IMG_NAME";
-    const string Column::DATASET_NAME = "DATASET_NAME";
+    const string Column::ID = "id";
+    const string Column::BRANCHING = "branching";
+    const string Column::DEPTH = "depth";
+    const string Column::NAME = "name";
+    const string Column::SCORING_TYPE = "scoring_type";
+    const string Column::WEIGHTING_TYPE = "weighting_type";
+    const string Column::PARENT_ID = "parent_id";
+    const string Column::WEIGHT = "weight";
+    const string Column::DESCRIPTOR = "descriptor";
+    const string Column::VOCAB_NAME = "vocab_name";
+    const string Column::NODE_ID = "node_id";
+    const string Column::ENTRIES_NUM = "entries_num";
+    const string Column::USING_DI = "using_di";
+    const string Column::DI_LEVELS = "di_levels";
+    const string Column::IMG_ID = "img_id";
+    const string Column::IMG_NAME = "img_name";
+    const string Column::DATASET_NAME = "dataset_name";
 }

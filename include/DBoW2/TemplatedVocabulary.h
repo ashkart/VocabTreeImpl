@@ -1627,7 +1627,7 @@ void TemplatedVocabulary<TDescriptor,F>::loadFromPG(pqxx::connection_base &conn)
 {
     work w(conn, "LoadingTree");
     string stmt = "loadingVocObj";
-    conn.prepare(stmt, "select * from " + vocabTableName + " where NAME = $1");
+    conn.prepare(stmt, "select * from " + vocabTableName + " where "+Column::NAME+" = $1");
     result res = ((invocation)w.prepared(stmt)(m_treeName)).exec();
     
     if (res.size() == 0)
@@ -1643,13 +1643,13 @@ void TemplatedVocabulary<TDescriptor,F>::loadFromPG(pqxx::connection_base &conn)
     {
         for (result::tuple::const_iterator column = row.begin(); column != row.end(); ++column)
         {
-            if (strcmp(column.name(), "branching") == 0) {
+            if (strcmp(column.name(), Column::BRANCHING) == 0) {
                 m_k = column.as<int>();
-            } else if (strcmp(column.name(), "depth") == 0) {
+            } else if (strcmp(column.name(), Column::DEPTH) == 0) {
                 m_L = column.as<int>();
-            } else if (strcmp(column.name(),"scoring_type") == 0) {
+            } else if (strcmp(column.name(), Column::SCORING_TYPE) == 0) {
                 m_scoring = (ScoringType)column.as<int>();
-            } else if (strcmp(column.name(), "weighting_type") == 0) {
+            } else if (strcmp(column.name(), Column::WEIGHTING_TYPE) == 0) {
                 m_weighting = (WeightingType)column.as<int>();
             }
         }
@@ -1661,7 +1661,7 @@ void TemplatedVocabulary<TDescriptor,F>::loadFromPG(pqxx::connection_base &conn)
     //nodes
     stmt = "loadingNodes";
     conn.prepare(stmt, "select * from " + nodestableName + " where " 
-    + nodestableName + ".VOCAB_NAME = $1");
+    + nodestableName + "."+Column::VOCAB_NAME+" = $1");
     result res2 = ((invocation)w.prepared(stmt)(m_treeName))
             .exec();
     
@@ -1682,13 +1682,13 @@ void TemplatedVocabulary<TDescriptor,F>::loadFromPG(pqxx::connection_base &conn)
     {
         for (result::tuple::const_iterator column = row.begin(); column != row.end(); ++column)
         {                             
-            if (strcmp(column.name(), "id") == 0) {
+            if (strcmp(column.name(), Column::ID) == 0) {
                 nid = column.as<int>();
-            } else if (strcmp(column.name(), "parent_id") == 0) {
+            } else if (strcmp(column.name(), Column::PARENT_ID) == 0) {
                 pid = column.as<int>();
-            } else if (strcmp(column.name(), "weight") == 0) {
+            } else if (strcmp(column.name(), Column::WEIGHT) == 0) {
                 weight = column.as<double>();
-            } else if (strcmp(column.name(), "descriptor") == 0) {
+            } else if (strcmp(column.name(), Column::DESCRIPTOR) == 0) {
                 d = column.as<string>();
             }
         }
@@ -1704,7 +1704,7 @@ void TemplatedVocabulary<TDescriptor,F>::loadFromPG(pqxx::connection_base &conn)
     //words
     stmt = "loadingWords";
     conn.prepare(stmt, "select * from " + wordsTableName + " where " 
-    + wordsTableName + ".VOCAB_NAME = $1");
+    + wordsTableName + "."+Column::VOCAB_NAME+" = $1");
     result res3 = ((invocation)w.prepared(stmt)(m_treeName))
             .exec();
     
@@ -1721,9 +1721,9 @@ void TemplatedVocabulary<TDescriptor,F>::loadFromPG(pqxx::connection_base &conn)
     {
         for (result::tuple::const_iterator column = row.begin(); column != row.end(); ++column)
         {                             
-            if (strcmp(column.name(), "id") == 0) {
+            if (strcmp(column.name(), Column::ID) == 0) {
                 wid = column.as<int>();
-            } else if (strcmp(column.name(), "node_id") == 0) {
+            } else if (strcmp(column.name(), Column::NODE_ID) == 0) {
                 _nid = column.as<int>();
             }
         }

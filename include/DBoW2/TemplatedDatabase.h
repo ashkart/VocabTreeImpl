@@ -22,6 +22,7 @@
 #include "ScoringObject.h"
 #include "BowVector.h"
 #include "FeatureVector.h"
+#include "Column.h"
 
 #include <DUtils/DUtils.h>
 
@@ -35,6 +36,8 @@ struct MyKeyHash {
 };
 
 using namespace std;
+using namespace pqxx;
+using namespace prepare;
 
 namespace DBoW2 {
 
@@ -1224,16 +1227,24 @@ const string& recordName) const
         work w(conn, "SavingTree");
         //inserting dataset row
         statementName = "DataInsert";
-        conn.prepare(statementName, "insert into " + dataTableName 
-                + "(NAME, ENTRIES_NUM, USING_DI, DI_LEVELS, VOCAB_NAME) "
-                "values ($1, $2, $3, $4, $5)");
+        ostringstream queryoss;
+        queryoss << "insert into " << dataTableName << "(" << 
+                Column::DATASET_NAME << ", " << Column::ENTRIES_NUM << ", " << 
+                Column::USING_DI << ", " << Column::DI_LEVELS << ", " << 
+                Column::VOCAB_NAME << ") values ($1, $2, $3, $4, $5)";
+        conn.prepare(statementName, queryoss.str());
+        ((invocation)w.prepared(statementName)(recordName)(m_nentries)(m_use_di)
+                (m_dilevels)(m_voc->m_treeName)).exec();
         
         
         //inserting images data
         statementName = "ImagesDataInsert";
-        conn.prepare(statementName, "insert into " + imageDBTableName
-                + "(IMG_ID, WEIGHT, IMG_NAME, DATASET_NAME) "
-                "values ($1, $2, $3, $4)");
+        queryoss.clear();
+        queryoss << "insert into " << imageDBTableName << "(" << 
+                Column::IMG_ID << ", " << Column::WEIGHT << ", " << 
+                Column::IMG_NAME << ", " << Column::DATASET_NAME << 
+                ") values ($1, $2, $3, $4)";
+        conn.prepare(statementName, queryoss.str());
 
         typename InvertedFile::const_iterator iit;
         typename IFRow::const_iterator irit;
@@ -1243,7 +1254,6 @@ const string& recordName) const
           {
             ((invocation)w.prepared(statementName)((int)irit->entry_id)
                     ((double)irit->word_weight)(irit->image_name)).exec();
-                 
           }
         }
         
@@ -1267,7 +1277,7 @@ createTables(pqxx::connection_base& conn) const
         
         try {
             conn.prepare(stmt, "create table " + dataTableName + " (" +
-            Column::NAME + " text not null, " +
+            Column::DATASET_NAME + " text not null, " +
             Column::ENTRIES_NUM + " int4 not null," +
             Column::USING_DI + " boolean not null, " +
             Column::DI_LEVELS + " int4 not null, " +
@@ -1417,6 +1427,56 @@ template<class TDescriptor, class F>
 void TemplatedDatabase<TDescriptor, F>::loadFromPG(pqxx::connection_base& conn, 
 const string& vocTreeName)
 {
+    work w(conn, "LoadingDB");
+    string stmt = "loadRec";
+    conn.prepare(stmt, "select * from " + dataTableName + " where " +
+    Column::VOCAB_NAME + " = $1");
+    result res = ((invocation)w.prepared(stmt)(vocTreeName)).exec();
+    
+    if (res.size() == 0)
+    {
+        throw pqxx::plpgsql_no_data_found("tree with name '" + vocTreeName + 
+                "' not found");
+    }
+    
+    // load voc first
+    // subclasses must instantiate m_voc before calling this ::loadFromPG
+    if(!m_voc) 
+    {
+        m_voc = new TemplatedVocabulary<TDescriptor, F>(conn, vocTreeName);
+    } else if (strcmp(m_voc->m_treeName, vocTreeName) != 0){
+        delete m_voc;
+        m_voc = nullptr;
+        m_voc = new TemplatedVocabulary<TDescriptor, F>(conn, vocTreeName);
+    }
+    
+    // load database now
+    clear();
+    
+    for (result::const_iterator row = res.begin(); row != res.end(); ++row)
+    {
+        for (result::tuple::const_iterator col = row.begin(); col != row.end(); ++col)
+        {
+            if (strcmp(col.name(), Column::ENTRIES_NUM) == 0)
+            {
+                m_nentries = col.as<int>();
+            } else if (strcmp(col.name(), Column::USING_DI) == 0)
+            {
+                m_use_di = col.as<bool>();
+            } else if (strcmp(col.name(), Column::DI_LEVELS) == 0)
+            {
+                m_dilevels = col.as<int>();
+            }
+        }
+        break; //we need only single row in any case
+    }
+    
+    //load imageSetData
+    stmt = "loadImgSetData";
+    conn.prepare(stmt, "select * from " + imageDBTableName + 
+    "where " + Column::DATASET_NAME + " = $1");
+    w.prepared(stmt)()
+    
     
 }
 
