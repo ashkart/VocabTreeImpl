@@ -37,6 +37,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 OBJECTFILES= \
 	${OBJECTDIR}/main.o \
 	${OBJECTDIR}/src/BowVector.o \
+	${OBJECTDIR}/src/Column.o \
 	${OBJECTDIR}/src/FBrief.o \
 	${OBJECTDIR}/src/FORB.o \
 	${OBJECTDIR}/src/FSurf64.o \
@@ -78,6 +79,11 @@ ${OBJECTDIR}/src/BowVector.o: src/BowVector.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Iinclude/DBoW2 -I../../SDKs/opencv-2.4.13/include/opencv2 -I../../SDKs/DLib-1.0/include/DUtils -I../../SDKs/DLib-1.0/include/DUtilsCV -I../../SDKs/DLib-1.0/include/DVision -Iinclude -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/BowVector.o src/BowVector.cpp
+
+${OBJECTDIR}/src/Column.o: src/Column.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Iinclude/DBoW2 -I../../SDKs/opencv-2.4.13/include/opencv2 -I../../SDKs/DLib-1.0/include/DUtils -I../../SDKs/DLib-1.0/include/DUtilsCV -I../../SDKs/DLib-1.0/include/DVision -Iinclude -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/Column.o src/Column.cpp
 
 ${OBJECTDIR}/src/FBrief.o: src/FBrief.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src

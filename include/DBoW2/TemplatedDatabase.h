@@ -70,11 +70,6 @@ public:
   template<class T>
   explicit TemplatedDatabase(const T &voc, bool use_di = true, 
     int di_levels = 0);
-  
-  
-  template<class T>
-  explicit TemplatedDatabase(pqxx::connection_base &conn, 
-          const string &vocTreeName);
 
   /**
    * Copy constructor. Copies the vocabulary too
@@ -87,6 +82,9 @@ public:
    * @param filename
    */
   TemplatedDatabase(const std::string &filename);
+  
+  explicit TemplatedDatabase(pqxx::connection_base &conn, 
+          const string &vocTreeName);
 
   /** 
    * Creates the database from a file
@@ -234,6 +232,12 @@ public:
    * @param filename
    */
   void load(const string &filename);
+  
+  /**
+   * Loads the database from PostgreSQL
+   * @param conn connection to pgSQL
+   */
+  void loadFromPG(pqxx::connection_base &conn, const string &vocTreeName);
   
   /** 
    * Stores the database in the given file storage structure
@@ -409,6 +413,15 @@ TemplatedDatabase<TDescriptor, F>::TemplatedDatabase
   : m_voc(NULL)
 {
   load(filename);
+}
+
+// --------------------------------------------------------------------------
+
+template<class TDescriptor, class F>
+TemplatedDatabase<TDescriptor, F>::TemplatedDatabase
+(pqxx::connection_base& conn, const string &vocTreeName) : m_voc(NULL)
+{
+    loadFromPG(conn, vocTreeName);
 }
 
 // --------------------------------------------------------------------------
@@ -1191,7 +1204,7 @@ void TemplatedDatabase<TDescriptor, F>::saveToPG(pqxx::connection_base& conn,
 const string& recordName) const
 {
     if (m_use_di) {
-        throw exception("To store Database object in PgSQL [use_direct_index] "
+        throw pqxx::data_exception("To store Database object in PgSQL [use_direct_index] "
                 "parameter must be false!");
     }
     
@@ -1245,20 +1258,21 @@ const string& recordName) const
 }
 
 template<class TDescriptor, class F>
-void TemplatedDatabase<TDescriptor, F>::createTables(pqxx::connection_base& conn) const
+void TemplatedDatabase<TDescriptor, F>::
+createTables(pqxx::connection_base& conn) const
 {
     try {
         string stmt = "dataRec";
         work ww(conn, "creatingTables");
         
         try {
-            conn.prepare(stmt, "create table " + dataTableName + " ("
-            "NAME text not null, "
-            "ENTRIES_NUM int4 not null,"
-            "USING_DI boolean not null, "
-            "DI_LEVELS int4 not null, "
-            "VOCAB_NAME text not null references " + m_voc->vocabTableName + ","
-            "constraint pk_dataset_name primary key (NAME)"
+            conn.prepare(stmt, "create table " + dataTableName + " (" +
+            Column::NAME + " text not null, " +
+            Column::ENTRIES_NUM + " int4 not null," +
+            Column::USING_DI + " boolean not null, " +
+            Column::DI_LEVELS + " int4 not null, " +
+            Column::VOCAB_NAME + " text not null references " + m_voc->vocabTableName + ","
+            "constraint pk_"+dataTableName+" primary key ("+Column::NAME+")"
             ")");
             ((invocation)ww.prepared(stmt)).exec();
         } catch (const pqxx::pqxx_exception &e)
@@ -1269,12 +1283,12 @@ void TemplatedDatabase<TDescriptor, F>::createTables(pqxx::connection_base& conn
         
         try {
             stmt = "ImageRec";
-            conn.prepare(stmt, "create table " + imageDBTableName + " ("
-            "IMG_ID int4 not null,"
-            "WEIGHT double precision not null, "
-            "IMG_NAME text not null,"
-            "DATASET_NAME text not null references " + dataTableName + ","
-            "constraint pk_image_id primary key (IMG_ID, DATASET_NAME)"
+            conn.prepare(stmt, "create table " + imageDBTableName + " (" +
+            Column::IMG_ID + " int4 not null," + 
+            Column::WEIGHT + " double precision not null, " +
+            Column::IMG_NAME + "IMG_NAME text not null," +
+            Column::DATASET_NAME + " text not null references " + dataTableName + ","
+            "constraint pk_"+imageDBTableName+" primary key ("+Column::IMG_ID+", "+Column::DATASET_NAME+")"
             ")");
             ((invocation)ww.prepared(stmt)).exec();
         } catch (const pqxx::pqxx_exception &e) {
@@ -1395,6 +1409,15 @@ void TemplatedDatabase<TDescriptor, F>::load(const string &filename)
   if(!fs.isOpened()) throw string("Could not open file ") + filename;
   
   load(fs);
+}
+
+// --------------------------------------------------------------------------
+
+template<class TDescriptor, class F>
+void TemplatedDatabase<TDescriptor, F>::loadFromPG(pqxx::connection_base& conn, 
+const string& vocTreeName)
+{
+    
 }
 
 // --------------------------------------------------------------------------

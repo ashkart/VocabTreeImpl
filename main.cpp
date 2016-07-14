@@ -138,7 +138,7 @@ int main()
         const int L = 6;
         const WeightingType weight = TF_IDF;
         const ScoringType score = L1_NORM;
-        string vocabularyName = "myVocabulary";
+        const string vocabularyName = "myVocabulary";
         
         Surf64Vocabulary voc(vocabularyName, k, L, weight, score);
         getFeatures(features, imageDir);
@@ -154,8 +154,8 @@ int main()
         cout << "loading data into db..." << endl;
         loadFeaturesToDB(features, imageDir, db);
         
-        string datasetName = "myImageDataset";
-        db.save(c, );
+        const string datasetName = "myImageDataset";
+        db.saveToPG(c, datasetName);
         cout << "DB writed!" << endl; 
         
         //теперь попробуем выполнить запрос 

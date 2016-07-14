@@ -25,6 +25,7 @@
 #include "FeatureVector.h"
 #include "BowVector.h"
 #include "ScoringObject.h"
+#include "Column.h"
 
 #include <DUtils/DUtils.h>
 
@@ -1472,13 +1473,13 @@ void TemplatedVocabulary<TDescriptor,F>::createTables(pqxx::connection_base& con
         work ww(conn, "creatingTables");
         
         try {
-            conn.prepare(stmt, "create table " + vocabTableName + " ("
-            "NAME text not null, "
-            "BRANCHING int4 not null,"
-            "DEPTH int4 not null, "
-            "SCORING_TYPE int4 not null, "
-            "WEIGHTING_TYPE int4 not null,"
-            "constraint pk_voc_name primary key (NAME)"
+            conn.prepare(stmt, "create table " + vocabTableName + " (" +
+            Column::NAME + " text not null, " +
+            Column::BRANCHING + " int4 not null," +
+            Column::DEPTH + " int4 not null, " +
+            Column::SCORING_TYPE + " int4 not null, " +
+            Column::WEIGHTING_TYPE + " int4 not null" 
+            "constraint pk_"+ vocabTableName + " primary key ("+Column::NAME+")"
             ")");
             ((invocation)ww.prepared(stmt)).exec();
         } catch (const pqxx::pqxx_exception &e)
@@ -1489,13 +1490,13 @@ void TemplatedVocabulary<TDescriptor,F>::createTables(pqxx::connection_base& con
         
         try {
             stmt = "nodes";
-            conn.prepare(stmt, "create table " + nodestableName + " ("
-            "ID int4 not null,"
-            "PARENT_ID int4 not null, "
-            "WEIGHT double precision not null, "
-            "DESCRIPTOR text not null, "
-            "VOCAB_NAME text not null references " + vocabTableName + ","
-            "constraint pk_node_id primary key (ID, VOCAB_NAME)"
+            conn.prepare(stmt, "create table " + nodestableName + " (" +
+            Column::ID + " int4 not null,"+
+            Column::PARENT_ID + " int4 not null, "+
+            Column::WEIGHT + " double precision not null, "+
+            Column::DESCRIPTOR + " text not null, "+
+            Column::VOCAB_NAME + " text not null references " + vocabTableName + ","
+            "constraint pk_"+ nodestableName +" primary key ("+Column::ID+", "+Column::VOCAB_NAME+")"
             ")");
             ((invocation)ww.prepared(stmt)).exec();
         } catch (const pqxx::pqxx_exception &e) {
@@ -1505,11 +1506,11 @@ void TemplatedVocabulary<TDescriptor,F>::createTables(pqxx::connection_base& con
         
         try {
             stmt = "words";
-            conn.prepare(stmt, "create table " + wordsTableName + " ("
-            "ID int4 not null, "
-            "NODE_ID int4 not null, "
-            "VOCAB_NAME text not null references " + vocabTableName + ","
-            "constraint pk_word_id primary key (ID, VOCAB_NAME)"
+            conn.prepare(stmt, "create table " + wordsTableName + " (" +
+            Column::ID +" int4 not null, "+
+            Column::NODE_ID + " int4 not null, "+
+            Column::VOCAB_NAME + " text not null references " + vocabTableName + ","
+            "constraint pk_"+wordsTableName+" primary key ("+Column::ID+", "+Column::VOCAB_NAME+")"
             ")");
             ((invocation)ww.prepared(stmt)).exec();
         } catch (const pqxx::pqxx_exception &e) {
