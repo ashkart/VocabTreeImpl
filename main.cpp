@@ -126,56 +126,52 @@ void loadFeaturesToDB(vector<vector<vector<float> > > &features, string &imageDi
 int main()
 {
     vector<vector<vector<float> > > features;
-    string imageDir = "images";
+    string imageDir = "/home/max/NetBeansProjects/datas/im2";
     
     
     try {
         string conn_str = "host=localhost user=admin password=ss dbname=pgTest";
         connection c(conn_str);
 
-        //cout << "Retrieving voc_tree..." << endl;
-        const int k = 8;
-        const int L = 6;
+        cout << "Retrieving voc_tree..." << endl;
+        const int k = 10;
+        const int L = 5;
         const WeightingType weight = TF_IDF;
         const ScoringType score = L1_NORM;
         const string vocabularyName = "myVocabulary";
         
+        /* создание дерева
         Surf64Vocabulary voc(vocabularyName, k, L, weight, score);
         getFeatures(features, imageDir);
         voc.create(features);
         voc.saveToPG(c);
+        */
+        //Surf64Vocabulary voc(c, vocabularyName);
         
-        cout << "Creating database..." << endl;
-        Surf64Database db(c, vocabularyName);// можно использовать экземпляр voc,
-                                             // вызвав конструктор "полегче",
-                                             // но для демонстрации работы с СУБД 
-                                             // оставляю так
-        /*================================================================*/
-        cout << "loading data into db..." << endl;
-        loadFeaturesToDB(features, imageDir, db);
         
         const string datasetName = "myImageDataset";
+        /* создание базы "слов" на основе дерева
+        cout << "Creating database..." << endl;
+        Surf64Database db(datasetName, voc, false);
+        cout << "loading data into db..." << endl;
+        loadFeaturesToDB(features, imageDir, db);
         db.saveToPG(c, datasetName);
         cout << "DB writed!" << endl; 
-        
+        */
+        cout << "Loading database..." << endl;
+        Surf64Database db(c, vocabularyName, datasetName);
+
         //теперь попробуем выполнить запрос 
-        
         cout << "Querying result..." << endl;
         QueryResults ret;
         features.clear();
         features.reserve(1);
-        string qi = "/home/max/NetBeansProjects/CppApplication_1/im2/255-srbn.jpg";
+        string qi = "/home/max/NetBeansProjects/datas/255-srbn.jpg";
         getFeature(features, qi);
-        db.query(features[0], ret, 4);
-        
+        db.query(features[0], ret, 1);
         cout << "the result is:\n" << ret << endl;
         
-        /**
-         * как видно, запросы сейчас выполняются к набору данных, загруженному 
-         * в память из БД а не к самой БД.
-         * 
-         */
-        
+        c.disconnect();
     } catch (const pqxx::pqxx_exception &e) {
         std::cerr << "Error:\n" << e.base().what() << std::endl;
     }

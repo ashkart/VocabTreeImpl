@@ -53,7 +53,7 @@ public:
    * @param weighting weighting type
    * @param scoring scoring type
    */
-  TemplatedVocabulary(const std::string &treeName, int k = 10, int L = 5, 
+  TemplatedVocabulary(const std::string &treeName, int k, int L, 
     WeightingType weighting = TF_IDF, ScoringType scoring = L1_NORM);
   
   /**
@@ -533,6 +533,7 @@ TemplatedVocabulary<TDescriptor,F>::TemplatedVocabulary(
   : m_scoring_object(NULL)
 {
   *this = voc;
+  m_treeName = voc.m_treeName;
 }
 
 // --------------------------------------------------------------------------
@@ -1400,8 +1401,12 @@ void TemplatedVocabulary<TDescriptor,F>::saveToPG(pqxx::connection_base& conn) c
         work w(conn, "SavingTree");
         //inserting voabulary
         statementName = "VocInsert";
-        conn.prepare(statementName, "insert into " + vocabTableName + " (NAME, BRANCHING, DEPTH, SCORING_TYPE, WEIGHTONG_TYPE) "
-                                    "VALUES ($1, $2, $3, $4, $5)");
+        ostringstream queryoss;
+        queryoss << "insert into " << vocabTableName << "(" << 
+                Column::NAME << ", " << Column::BRANCHING << ", " << 
+                Column::DEPTH << ", " << Column::SCORING_TYPE << ", " << 
+                Column::WEIGHTING_TYPE << ") values ($1, $2, $3, $4, $5)";
+        conn.prepare(statementName, queryoss.str());
         ((invocation)w.prepared(statementName)
                 (m_treeName)(this->m_k)(this->m_L)((int)this->m_scoring)
                 ((int)this->m_weighting)).exec();
@@ -1414,8 +1419,12 @@ void TemplatedVocabulary<TDescriptor,F>::saveToPG(pqxx::connection_base& conn) c
 
         //inserting nodes
         statementName = "nodesInsert";
-        conn.prepare(statementName, "insert into " + nodestableName + " (ID, PARENT_ID, WEIGHT, DESCRIPTOR, VOCAB_NAME) "
-                                    "VALUES ($1, $2, $3, $4, $5)");
+        queryoss.str("");
+        queryoss << "insert into " << nodestableName << "(" << 
+                Column::ID << ", " << Column::PARENT_ID << ", " << 
+                Column::WEIGHT << ", " << Column::DESCRIPTOR << ", " << 
+                Column::VOCAB_NAME << ") values ($1, $2, $3, $4, $5)";
+        conn.prepare(statementName, queryoss.str());
         while(!parents.empty())
         {
           NodeId pid = parents.back();
@@ -1446,8 +1455,11 @@ void TemplatedVocabulary<TDescriptor,F>::saveToPG(pqxx::connection_base& conn) c
 
         //inserting words
         statementName = "insertWords";
-        conn.prepare(statementName, "insert into " + wordsTableName + " (ID, NODE_ID, VOCAB_NAME) "
-                                    "VALUES ($1, $2, $3)");
+        queryoss.str("");
+        queryoss << "insert into " << wordsTableName << "(" << 
+                Column::ID << ", " << Column::NODE_ID << ", " << 
+                Column::VOCAB_NAME << ") values ($1, $2, $3)";
+        conn.prepare(statementName, queryoss.str());
         typename vector<Node*>::const_iterator wit;
         for(wit = m_words.begin(); wit != m_words.end(); wit++)
         {
@@ -1475,10 +1487,10 @@ void TemplatedVocabulary<TDescriptor,F>::createTables(pqxx::connection_base& con
         try {
             conn.prepare(stmt, "create table " + vocabTableName + " (" +
             Column::NAME + " text not null, " +
-            Column::BRANCHING + " int4 not null," +
-            Column::DEPTH + " int4 not null, " +
-            Column::SCORING_TYPE + " int4 not null, " +
-            Column::WEIGHTING_TYPE + " int4 not null" 
+            Column::BRANCHING + " bigint not null," +
+            Column::DEPTH + " bigint not null, " +
+            Column::SCORING_TYPE + " bigint not null, " +
+            Column::WEIGHTING_TYPE + " bigint not null, " 
             "constraint pk_"+ vocabTableName + " primary key ("+Column::NAME+")"
             ")");
             ((invocation)ww.prepared(stmt)).exec();
@@ -1491,8 +1503,8 @@ void TemplatedVocabulary<TDescriptor,F>::createTables(pqxx::connection_base& con
         try {
             stmt = "nodes";
             conn.prepare(stmt, "create table " + nodestableName + " (" +
-            Column::ID + " int4 not null,"+
-            Column::PARENT_ID + " int4 not null, "+
+            Column::ID + " bigint not null,"+
+            Column::PARENT_ID + " bigint not null, "+
             Column::WEIGHT + " double precision not null, "+
             Column::DESCRIPTOR + " text not null, "+
             Column::VOCAB_NAME + " text not null references " + vocabTableName + ","
@@ -1507,8 +1519,8 @@ void TemplatedVocabulary<TDescriptor,F>::createTables(pqxx::connection_base& con
         try {
             stmt = "words";
             conn.prepare(stmt, "create table " + wordsTableName + " (" +
-            Column::ID +" int4 not null, "+
-            Column::NODE_ID + " int4 not null, "+
+            Column::ID +" bigint not null, "+
+            Column::NODE_ID + " bigint not null, "+
             Column::VOCAB_NAME + " text not null references " + vocabTableName + ","
             "constraint pk_"+wordsTableName+" primary key ("+Column::ID+", "+Column::VOCAB_NAME+")"
             ")");
@@ -1643,13 +1655,13 @@ void TemplatedVocabulary<TDescriptor,F>::loadFromPG(pqxx::connection_base &conn)
     {
         for (result::tuple::const_iterator column = row.begin(); column != row.end(); ++column)
         {
-            if (strcmp(column.name(), Column::BRANCHING) == 0) {
+            if (strcmp(column.name(), Column::BRANCHING.c_str()) == 0) {
                 m_k = column.as<int>();
-            } else if (strcmp(column.name(), Column::DEPTH) == 0) {
+            } else if (strcmp(column.name(), Column::DEPTH.c_str()) == 0) {
                 m_L = column.as<int>();
-            } else if (strcmp(column.name(), Column::SCORING_TYPE) == 0) {
+            } else if (strcmp(column.name(), Column::SCORING_TYPE.c_str()) == 0) {
                 m_scoring = (ScoringType)column.as<int>();
-            } else if (strcmp(column.name(), Column::WEIGHTING_TYPE) == 0) {
+            } else if (strcmp(column.name(), Column::WEIGHTING_TYPE.c_str()) == 0) {
                 m_weighting = (WeightingType)column.as<int>();
             }
         }
@@ -1682,13 +1694,13 @@ void TemplatedVocabulary<TDescriptor,F>::loadFromPG(pqxx::connection_base &conn)
     {
         for (result::tuple::const_iterator column = row.begin(); column != row.end(); ++column)
         {                             
-            if (strcmp(column.name(), Column::ID) == 0) {
+            if (strcmp(column.name(), Column::ID.c_str()) == 0) {
                 nid = column.as<int>();
-            } else if (strcmp(column.name(), Column::PARENT_ID) == 0) {
+            } else if (strcmp(column.name(), Column::PARENT_ID.c_str()) == 0) {
                 pid = column.as<int>();
-            } else if (strcmp(column.name(), Column::WEIGHT) == 0) {
+            } else if (strcmp(column.name(), Column::WEIGHT.c_str()) == 0) {
                 weight = column.as<double>();
-            } else if (strcmp(column.name(), Column::DESCRIPTOR) == 0) {
+            } else if (strcmp(column.name(), Column::DESCRIPTOR.c_str()) == 0) {
                 d = column.as<string>();
             }
         }
@@ -1721,9 +1733,9 @@ void TemplatedVocabulary<TDescriptor,F>::loadFromPG(pqxx::connection_base &conn)
     {
         for (result::tuple::const_iterator column = row.begin(); column != row.end(); ++column)
         {                             
-            if (strcmp(column.name(), Column::ID) == 0) {
+            if (strcmp(column.name(), Column::ID.c_str()) == 0) {
                 wid = column.as<int>();
-            } else if (strcmp(column.name(), Column::NODE_ID) == 0) {
+            } else if (strcmp(column.name(), Column::NODE_ID.c_str()) == 0) {
                 _nid = column.as<int>();
             }
         }

@@ -51,6 +51,7 @@ template<class TDescriptor, class F>
 class TemplatedDatabase
 {
 public:
+    string datasetName;
     string dataTableName = "db_datasets";
     string imageDBTableName = "image_datasets";
     
@@ -60,7 +61,8 @@ public:
    * @param di_levels levels to go up the vocabulary tree to select the 
    *   node id to store in the direct index when adding images
    */
-  explicit TemplatedDatabase(bool use_di = true, int di_levels = 0);
+  explicit TemplatedDatabase(const string &dbName, bool use_di, 
+          int di_levels = 0);
 
   /**
    * Creates a database with the given vocabulary
@@ -71,8 +73,8 @@ public:
    *   node id to store in the direct index when adding images
    */
   template<class T>
-  explicit TemplatedDatabase(const T &voc, bool use_di = true, 
-    int di_levels = 0);
+  explicit TemplatedDatabase(const string &dbName, const T &voc, 
+          bool use_di = true, int di_levels = 0);
 
   /**
    * Copy constructor. Copies the vocabulary too
@@ -86,8 +88,13 @@ public:
    */
   TemplatedDatabase(const std::string &filename);
   
+  /**
+   * Creates the database object from a PostgreSQL database
+   * @param conn connection to pgSQL
+   * @param vocTreeName name of vocabulary tree on which db based
+   */
   explicit TemplatedDatabase(pqxx::connection_base &conn, 
-          const string &vocTreeName);
+          const string &vocTreeName, const string &dbName);
 
   /** 
    * Creates the database from a file
@@ -371,8 +378,8 @@ protected:
 
 template<class TDescriptor, class F>
 TemplatedDatabase<TDescriptor, F>::TemplatedDatabase
-  (bool use_di, int di_levels)
-  : m_voc(NULL), m_use_di(use_di), m_dilevels(di_levels)
+  (const string &dbName, bool use_di, int di_levels)
+  : datasetName(dbName), m_voc(NULL), m_dilevels(di_levels)
 {
 }
 
@@ -381,8 +388,8 @@ TemplatedDatabase<TDescriptor, F>::TemplatedDatabase
 template<class TDescriptor, class F>
 template<class T>
 TemplatedDatabase<TDescriptor, F>::TemplatedDatabase
-  (const T &voc, bool use_di, int di_levels)
-  : m_voc(NULL), m_use_di(use_di), m_dilevels(di_levels)
+  (const string &dbName, const T &voc, bool use_di, int di_levels)
+  : datasetName(dbName), m_voc(NULL), m_use_di(use_di), m_dilevels(di_levels)
 {
   setVocabulary(voc);
   clear();
@@ -422,7 +429,8 @@ TemplatedDatabase<TDescriptor, F>::TemplatedDatabase
 
 template<class TDescriptor, class F>
 TemplatedDatabase<TDescriptor, F>::TemplatedDatabase
-(pqxx::connection_base& conn, const string &vocTreeName) : m_voc(NULL)
+(pqxx::connection_base& conn, const string &vocTreeName, const string &dbName) 
+: m_voc(NULL), datasetName(dbName)
 {
     loadFromPG(conn, vocTreeName);
 }
@@ -1239,26 +1247,27 @@ const string& recordName) const
         
         //inserting images data
         statementName = "ImagesDataInsert";
-        queryoss.clear();
-        queryoss << "insert into " << imageDBTableName << "(" << 
+        queryoss.str("");
+        queryoss << "insert into " << imageDBTableName << "(" <<
+                Column::ID << ", " <<
                 Column::IMG_ID << ", " << Column::WEIGHT << ", " << 
                 Column::IMG_NAME << ", " << Column::DATASET_NAME << 
-                ") values ($1, $2, $3, $4)";
+                ") values ($1, $2, $3, $4, $5)";
         conn.prepare(statementName, queryoss.str());
 
         typename InvertedFile::const_iterator iit;
         typename IFRow::const_iterator irit;
+        unsigned long id = 0;
         for(iit = m_ifile.begin(); iit != m_ifile.end(); ++iit)
         {
-          for(irit = iit->begin(); irit != iit->end(); ++irit)
+          for(irit = iit->begin(); irit != iit->end(); ++irit, ++id)
           {
-            ((invocation)w.prepared(statementName)((int)irit->entry_id)
-                    ((double)irit->word_weight)(irit->image_name)).exec();
+            ((invocation)w.prepared(statementName)(id)((int)irit->entry_id)
+                    ((double)irit->word_weight)(irit->image_name)(datasetName)).exec();
           }
         }
         
         w.commit();
-        
     } catch (const pqxx::pqxx_exception &ex) {
         cout << "Error while saving  ImageDataSet data into DB, "
                 "method: saveToPG(): " << ex.base().what() << endl;
@@ -1278,11 +1287,11 @@ createTables(pqxx::connection_base& conn) const
         try {
             conn.prepare(stmt, "create table " + dataTableName + " (" +
             Column::DATASET_NAME + " text not null, " +
-            Column::ENTRIES_NUM + " int4 not null," +
+            Column::ENTRIES_NUM + " bigint not null," +
             Column::USING_DI + " boolean not null, " +
-            Column::DI_LEVELS + " int4 not null, " +
+            Column::DI_LEVELS + " bigint not null, " +
             Column::VOCAB_NAME + " text not null references " + m_voc->vocabTableName + ","
-            "constraint pk_"+dataTableName+" primary key ("+Column::NAME+")"
+            "constraint pk_"+dataTableName+" primary key ("+Column::DATASET_NAME+")"
             ")");
             ((invocation)ww.prepared(stmt)).exec();
         } catch (const pqxx::pqxx_exception &e)
@@ -1294,11 +1303,12 @@ createTables(pqxx::connection_base& conn) const
         try {
             stmt = "ImageRec";
             conn.prepare(stmt, "create table " + imageDBTableName + " (" +
-            Column::IMG_ID + " int4 not null," + 
+            Column::ID + " bigint not null," +
+            Column::IMG_ID + " bigint not null," + 
             Column::WEIGHT + " double precision not null, " +
-            Column::IMG_NAME + "IMG_NAME text not null," +
+            Column::IMG_NAME + " text not null," +
             Column::DATASET_NAME + " text not null references " + dataTableName + ","
-            "constraint pk_"+imageDBTableName+" primary key ("+Column::IMG_ID+", "+Column::DATASET_NAME+")"
+            "constraint pk_"+imageDBTableName+" primary key ("+Column::ID+","+Column::IMG_ID+","+Column::DATASET_NAME+")"
             ")");
             ((invocation)ww.prepared(stmt)).exec();
         } catch (const pqxx::pqxx_exception &e) {
@@ -1427,27 +1437,29 @@ template<class TDescriptor, class F>
 void TemplatedDatabase<TDescriptor, F>::loadFromPG(pqxx::connection_base& conn, 
 const string& vocTreeName)
 {
-    work w(conn, "LoadingDB");
-    string stmt = "loadRec";
-    conn.prepare(stmt, "select * from " + dataTableName + " where " +
-    Column::VOCAB_NAME + " = $1");
-    result res = ((invocation)w.prepared(stmt)(vocTreeName)).exec();
-    
-    if (res.size() == 0)
-    {
-        throw pqxx::plpgsql_no_data_found("tree with name '" + vocTreeName + 
-                "' not found");
-    }
-    
     // load voc first
     // subclasses must instantiate m_voc before calling this ::loadFromPG
     if(!m_voc) 
     {
         m_voc = new TemplatedVocabulary<TDescriptor, F>(conn, vocTreeName);
-    } else if (strcmp(m_voc->m_treeName, vocTreeName) != 0){
+    } else if (strcmp(m_voc->m_treeName.c_str(), vocTreeName.c_str()) != 0){
         delete m_voc;
         m_voc = nullptr;
         m_voc = new TemplatedVocabulary<TDescriptor, F>(conn, vocTreeName);
+    }
+    
+    work w(conn, "LoadingDB");
+    string stmt = "loadRec";
+    conn.prepare(stmt, "select * from " + dataTableName + " where " +
+    Column::VOCAB_NAME + " = $1" + " and " + 
+    Column::DATASET_NAME + " = $2");
+    result res = ((invocation)w.prepared(stmt)(vocTreeName)(datasetName)).exec();
+
+    if (res.size() == 0)
+    {
+        throw pqxx::plpgsql_no_data_found("data with " +
+            Column::VOCAB_NAME + " = " + vocTreeName + " or " + 
+            Column::DATASET_NAME + " = " + datasetName + " not found");
     }
     
     // load database now
@@ -1457,13 +1469,13 @@ const string& vocTreeName)
     {
         for (result::tuple::const_iterator col = row.begin(); col != row.end(); ++col)
         {
-            if (strcmp(col.name(), Column::ENTRIES_NUM) == 0)
+            if (strcmp(col.name(), Column::ENTRIES_NUM.c_str()) == 0)
             {
                 m_nentries = col.as<int>();
-            } else if (strcmp(col.name(), Column::USING_DI) == 0)
+            } else if (strcmp(col.name(), Column::USING_DI.c_str()) == 0)
             {
                 m_use_di = col.as<bool>();
-            } else if (strcmp(col.name(), Column::DI_LEVELS) == 0)
+            } else if (strcmp(col.name(), Column::DI_LEVELS.c_str()) == 0)
             {
                 m_dilevels = col.as<int>();
             }
@@ -1474,10 +1486,31 @@ const string& vocTreeName)
     //load imageSetData
     stmt = "loadImgSetData";
     conn.prepare(stmt, "select * from " + imageDBTableName + 
-    "where " + Column::DATASET_NAME + " = $1");
-    w.prepared(stmt)()
-    
-    
+    " where " + Column::DATASET_NAME + " = $1");
+    result res2 = ((invocation)w.prepared(stmt)(datasetName)).exec();
+    m_ifile.resize(res2.size());
+    EntryId eid;
+    WordValue v;
+    std::string img_name;
+    WordId wid = 0;
+    for (result::const_iterator row = res2.begin(); row != res2.end(); ++row, ++wid)
+    {       
+        for (result::tuple::const_iterator col = row.begin(); col != row.end(); ++col)
+        {
+            if (strcmp(col.name(), Column::IMG_ID.c_str()) == 0)
+            {
+                eid = col.as<int>();
+            } else if (strcmp(col.name(), Column::WEIGHT.c_str()) == 0)
+            {
+                v = col.as<double>();
+            } else if (strcmp(col.name(), Column::IMG_NAME.c_str()) == 0)
+            {
+                img_name = col.as<string>();
+            }
+        }
+        m_ifile[wid].push_back(IFPair(eid, v, img_name));
+    }
+    w.abort();
 }
 
 // --------------------------------------------------------------------------
@@ -1488,7 +1521,7 @@ void TemplatedDatabase<TDescriptor, F>::load(const cv::FileStorage &fs,
 { 
   // load voc first
   // subclasses must instantiate m_voc before calling this ::load
-  if(!m_voc) m_voc = new TemplatedVocabulary<TDescriptor, F>("defaultName");
+  if(!m_voc) m_voc = new TemplatedVocabulary<TDescriptor, F>("defaultName", 10, 5);
   
   m_voc->load(fs);
 
