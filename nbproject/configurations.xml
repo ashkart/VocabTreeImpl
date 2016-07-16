@@ -6,7 +6,6 @@
                    projectFiles="true">
       <itemPath>src/BowVector.cpp</itemPath>
       <itemPath>src/Column.cpp</itemPath>
-      <itemPath>src/DBoW2.cmake.in</itemPath>
       <itemPath>src/FBrief.cpp</itemPath>
       <itemPath>src/FORB.cpp</itemPath>
       <itemPath>src/FSurf64.cpp</itemPath>
@@ -140,8 +139,6 @@
       </item>
       <item path="src/Column.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="src/DBoW2.cmake.in" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="src/FBrief.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/FORB.cpp" ex="false" tool="1" flavor2="0">
@@ -168,6 +165,15 @@
         <ccTool>
           <developmentMode>5</developmentMode>
           <standard>8</standard>
+          <incDir>
+            <pElem>../../SDKs/DLib-1.0/include/DUtils</pElem>
+            <pElem>../../SDKs/DLib-1.0/include/DUtilsCV</pElem>
+            <pElem>../../SDKs/DLib-1.0/include/DVision</pElem>
+            <pElem>../../SDKs/opencv-2.4.13/include/opencv</pElem>
+            <pElem>../../SDKs/opencv-2.4.13/include/opencv2</pElem>
+            <pElem>include/DBoW2</pElem>
+            <pElem>include</pElem>
+          </incDir>
         </ccTool>
         <fortranCompilerTool>
           <developmentMode>5</developmentMode>
@@ -175,6 +181,13 @@
         <asmTool>
           <developmentMode>5</developmentMode>
         </asmTool>
+        <linkerTool>
+          <linkerAddLib>
+            <pElem>../../SDKs/opencv-2.4.13/build/lib</pElem>
+            <pElem>../../SDKs/DLib-1.0/build</pElem>
+          </linkerAddLib>
+          <commandLine>-lpqxx -lpq</commandLine>
+        </linkerTool>
       </compileType>
       <item path="include/Column.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -214,8 +227,6 @@
       <item path="src/BowVector.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/Column.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/DBoW2.cmake.in" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/FBrief.cpp" ex="false" tool="1" flavor2="0">
       </item>

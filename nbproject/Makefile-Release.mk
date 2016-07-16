@@ -60,7 +60,7 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=
+LDLIBSOPTIONS=-L../../SDKs/opencv-2.4.13/build/lib -L../../SDKs/DLib-1.0/build
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
@@ -68,52 +68,52 @@ LDLIBSOPTIONS=
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/voctreeimpl: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/voctreeimpl ${OBJECTFILES} ${LDLIBSOPTIONS}
+	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/voctreeimpl ${OBJECTFILES} ${LDLIBSOPTIONS} -lpqxx -lpq
 
 ${OBJECTDIR}/main.o: main.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.cpp
+	$(COMPILE.cc) -O2 -I../../SDKs/DLib-1.0/include/DUtils -I../../SDKs/DLib-1.0/include/DUtilsCV -I../../SDKs/DLib-1.0/include/DVision -I../../SDKs/opencv-2.4.13/include/opencv -I../../SDKs/opencv-2.4.13/include/opencv2 -Iinclude/DBoW2 -Iinclude -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.cpp
 
 ${OBJECTDIR}/src/BowVector.o: src/BowVector.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/BowVector.o src/BowVector.cpp
+	$(COMPILE.cc) -O2 -I../../SDKs/DLib-1.0/include/DUtils -I../../SDKs/DLib-1.0/include/DUtilsCV -I../../SDKs/DLib-1.0/include/DVision -I../../SDKs/opencv-2.4.13/include/opencv -I../../SDKs/opencv-2.4.13/include/opencv2 -Iinclude/DBoW2 -Iinclude -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/BowVector.o src/BowVector.cpp
 
 ${OBJECTDIR}/src/Column.o: src/Column.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/Column.o src/Column.cpp
+	$(COMPILE.cc) -O2 -I../../SDKs/DLib-1.0/include/DUtils -I../../SDKs/DLib-1.0/include/DUtilsCV -I../../SDKs/DLib-1.0/include/DVision -I../../SDKs/opencv-2.4.13/include/opencv -I../../SDKs/opencv-2.4.13/include/opencv2 -Iinclude/DBoW2 -Iinclude -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/Column.o src/Column.cpp
 
 ${OBJECTDIR}/src/FBrief.o: src/FBrief.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/FBrief.o src/FBrief.cpp
+	$(COMPILE.cc) -O2 -I../../SDKs/DLib-1.0/include/DUtils -I../../SDKs/DLib-1.0/include/DUtilsCV -I../../SDKs/DLib-1.0/include/DVision -I../../SDKs/opencv-2.4.13/include/opencv -I../../SDKs/opencv-2.4.13/include/opencv2 -Iinclude/DBoW2 -Iinclude -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/FBrief.o src/FBrief.cpp
 
 ${OBJECTDIR}/src/FORB.o: src/FORB.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/FORB.o src/FORB.cpp
+	$(COMPILE.cc) -O2 -I../../SDKs/DLib-1.0/include/DUtils -I../../SDKs/DLib-1.0/include/DUtilsCV -I../../SDKs/DLib-1.0/include/DVision -I../../SDKs/opencv-2.4.13/include/opencv -I../../SDKs/opencv-2.4.13/include/opencv2 -Iinclude/DBoW2 -Iinclude -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/FORB.o src/FORB.cpp
 
 ${OBJECTDIR}/src/FSurf64.o: src/FSurf64.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/FSurf64.o src/FSurf64.cpp
+	$(COMPILE.cc) -O2 -I../../SDKs/DLib-1.0/include/DUtils -I../../SDKs/DLib-1.0/include/DUtilsCV -I../../SDKs/DLib-1.0/include/DVision -I../../SDKs/opencv-2.4.13/include/opencv -I../../SDKs/opencv-2.4.13/include/opencv2 -Iinclude/DBoW2 -Iinclude -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/FSurf64.o src/FSurf64.cpp
 
 ${OBJECTDIR}/src/FeatureVector.o: src/FeatureVector.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/FeatureVector.o src/FeatureVector.cpp
+	$(COMPILE.cc) -O2 -I../../SDKs/DLib-1.0/include/DUtils -I../../SDKs/DLib-1.0/include/DUtilsCV -I../../SDKs/DLib-1.0/include/DVision -I../../SDKs/opencv-2.4.13/include/opencv -I../../SDKs/opencv-2.4.13/include/opencv2 -Iinclude/DBoW2 -Iinclude -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/FeatureVector.o src/FeatureVector.cpp
 
 ${OBJECTDIR}/src/QueryResults.o: src/QueryResults.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/QueryResults.o src/QueryResults.cpp
+	$(COMPILE.cc) -O2 -I../../SDKs/DLib-1.0/include/DUtils -I../../SDKs/DLib-1.0/include/DUtilsCV -I../../SDKs/DLib-1.0/include/DVision -I../../SDKs/opencv-2.4.13/include/opencv -I../../SDKs/opencv-2.4.13/include/opencv2 -Iinclude/DBoW2 -Iinclude -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/QueryResults.o src/QueryResults.cpp
 
 ${OBJECTDIR}/src/ScoringObject.o: src/ScoringObject.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/ScoringObject.o src/ScoringObject.cpp
+	$(COMPILE.cc) -O2 -I../../SDKs/DLib-1.0/include/DUtils -I../../SDKs/DLib-1.0/include/DUtilsCV -I../../SDKs/DLib-1.0/include/DVision -I../../SDKs/opencv-2.4.13/include/opencv -I../../SDKs/opencv-2.4.13/include/opencv2 -Iinclude/DBoW2 -Iinclude -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/ScoringObject.o src/ScoringObject.cpp
 
 # Subprojects
 .build-subprojects:
